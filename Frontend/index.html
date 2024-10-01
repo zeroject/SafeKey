@@ -1,0 +1,43 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://early.webawesome.com;
+    style-src 'self' 'unsafe-inline' https://early.webawesome.com;
+    font-src 'self' https://early.webawesome.com;
+  ">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeKey - Login</title>
+  
+  <!-- Web Awesome CSS -->
+  <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/themes/default.css" />
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Web Awesome JS -->
+  <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/webawesome.loader.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>SafeKey</h1>
+    <wa-card class="login-card">
+      <h2 style="color: #1e1e1e;">Login</h2>
+      <form id="login-form">
+        <wa-input label="Password" type="password" id="passowrd" required></wa-input>
+        <wa-input label="Secret" type="password" id="secret" required></wa-input>
+        <wa-button type="submit" size="large" color="primary">Login</wa-button>
+      </form>
+    </wa-card>
+  </div>
+
+  <!-- Renderer JS -->
+  <script src="renderer.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>

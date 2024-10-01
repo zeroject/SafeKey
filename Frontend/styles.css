@@ -1,0 +1,55 @@
+/* styles.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    font-family: Arial, sans-serif;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .container {
+    text-align: center;
+  }
+  
+  h1 {
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    color: #bb86fc; /* Accent color */
+  }
+  
+  .login-card {
+    background-color: #1e1e1e;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  }
+  
+  .login-card h2 {
+    margin-bottom: 20px;
+    color: #ffffff;
+  }
+  
+  #login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  #login-form wa-button {
+    margin-top: 10px;
+  }
+  
+  a {
+    color: #03dac6;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
