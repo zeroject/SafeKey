@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "main": "main.js",
+  "type": "module",
   "scripts": {
     "start": "electron ."
   },
@@ -11,5 +12,8 @@
   "devDependencies": {
     "electron": "^32.1.2",
     "electron-reload": "^2.0.0-alpha.1"
+  },
+  "dependencies": {
+    "electron-store": "^10.0.0"
   }
 }

@@ -4,13 +4,21 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
   
-      const email = document.getElementById('password').value;
-      const password = document.getElementById('secret').value;
+      const password = document.getElementById('password').value;
+      const secret = document.getElementById('secret').value;
+      const loginButton = document.getElementById('login-button');
+      loginButton.setAttribute('loading', 'true');
   
       // Simple validation (expand as needed)
-      if (email && password) {
+      if (secret && password) {
         // TODO: Implement authentication logic
-        alert(`Logging in with Email: ${email}`);
+        setTimeout(() => {
+          // Remove the loading state after the task is complete
+          loginButton.removeAttribute('loading');
+  
+          // For demonstration, show a success alert
+          alert(`Logged in with Email: ${email}`);
+        }, 3000); // 3-second delay
       } else {
         alert('Please enter both email and password.');
       }

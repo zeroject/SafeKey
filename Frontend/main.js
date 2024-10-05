@@ -1,17 +1,20 @@
 // main.js
-const { app, BrowserWindow, Menu } = require('electron');
-const path = require('path');
+import { app, BrowserWindow, ipcMain, Menu } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import Store from 'electron-store';
 
 // Add this to enable auto-reload during development
-require('electron-reload')(__dirname, {
-    electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
-    // Add any other extensions you want to watch (e.g., CSS, HTML)
-    // Specifying 'ignored' option will avoid unnecessary reloads
-    ignored: /node_modules|[\/\\]\./
-  });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-function createWindow () {
-  const win = new BrowserWindow({
+const store = new Store();
+
+let mainWindow;
+let registerWindow;
+
+function createMainWindow () {
+  mainWindow = new BrowserWindow({
     width: 400,
     height: 600,
     resizable: false,
@@ -22,19 +25,79 @@ function createWindow () {
     }
   });
 
-  win.loadFile('index.html');
+  mainWindow.loadFile('index.html');
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 
   Menu.setApplicationMenu(null); // Hide default menu
   // Uncomment to open DevTools for debugging
   // win.webContents.openDevTools();
 }
 
-app.whenReady().then(() => {
-  createWindow();
-
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+function createRegisterWindow() {
+  registerWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    resizable: false,
+    modal: true,
+    show: false,
+    parent: mainWindow,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    },
   });
+
+  registerWindow.loadFile('register.html');
+
+  registerWindow.once('ready-to-show', () => {
+    registerWindow.show();
+  });
+
+  registerWindow.on('closed', () => {
+    registerWindow = null;
+  });
+}
+
+app.whenReady().then(() => {
+  // Check if the app has been registered
+  const isRegistered = store.get('isRegistered', false);
+
+  if (isRegistered) {
+    createMainWindow();
+  } else {
+    createMainWindow();
+    createRegisterWindow();
+  }
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      if (store.get('isRegistered', false)) {
+        createMainWindow();
+      } else {
+        createMainWindow();
+        createRegisterWindow();
+      }
+    }
+  });
+});
+
+ipcMain.on('registration-complete', (event, data) => {
+  // You can process registration data here if needed
+
+  // Set the flag to indicate registration is complete
+  store.set('isRegistered', true);
+
+  // Close the registration window
+  if (registerWindow) {
+    registerWindow.close();
+  }
+
+  // Optionally, show the main window if it was hidden
+  if (mainWindow) {
+    mainWindow.show();
+  }
 });
 
 app.on('window-all-closed', function () {

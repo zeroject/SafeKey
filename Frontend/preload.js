@@ -1,6 +1,6 @@
 // preload.js
-const { contextBridge } = require('electron');
+import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('api', {
-  // Expose APIs if needed
+  registerComplete: (data) => ipcRenderer.send('registration-complete', data),
 });

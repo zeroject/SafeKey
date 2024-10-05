@@ -1,0 +1,67 @@
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://early.webawesome.com;
+    style-src 'self' 'unsafe-inline' https://early.webawesome.com;
+    font-src 'self' https://early.webawesome.com;
+  ">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeKey - Register</title>
+  
+  <!-- Web Awesome CSS -->
+  <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/themes/default.css" />
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Web Awesome JS -->
+  <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/webawesome.loader.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <img src="safekey.png" alt="SafeKey Logo" class="logo">
+    <wa-card class="register-card">
+      <h2 style="color: #1e1e1e;">Register</h2>
+      <form id="register-form">
+        <wa-input label="Username" type="text" id="username" required></wa-input>
+        <wa-input label="Password" type="password" id="password" required></wa-input>
+        <wa-input label="Registration Key" type="password" id="regKey" required></wa-input>
+        <wa-button id="register-button" type="submit" size="large" color="primary">Register</wa-button>
+      </form>
+    </wa-card>
+  </div>
+
+    <!-- Renderer JS -->
+    <script src="renderer.js"></script>
+    <script src="register.js"></script>
+  <script>
+    const form = document.getElementById('register-form');
+  
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+  
+      const username = document.getElementById('username').value;
+      const key = document.getElementById('key').value;
+  
+      // Add your registration validation logic here
+      if (validateRegistration(username, key)) {
+        // Notify main process that registration is complete
+        window.api.registerComplete({ username, key });
+      } else {
+        alert('Invalid registration details.');
+      }
+    });
+  
+    function validateRegistration(username, key) {
+      // Replace this with actual validation logic
+      return username && key && key === 'YOUR_VALID_KEY';
+    }
+  </script>
+</body>
+</html>
