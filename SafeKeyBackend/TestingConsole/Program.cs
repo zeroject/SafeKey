@@ -5,10 +5,10 @@ class Program
 {
     static void Main(string[] args)
     {
-        var loginThread = new Thread(() => RunPipe("Login Pipe").GetAwaiter().GetResult());
-        var registerThread = new Thread(() => RunPipe("Register Pipe").GetAwaiter().GetResult());
-        var encryptThread = new Thread(() => RunPipe("Encrypt Pipe").GetAwaiter().GetResult());
-        var decryptThread = new Thread(() => RunPipe("Decrypt Pipe").GetAwaiter().GetResult());
+        var loginThread = new Thread(() => RunPipe("LoginPipe").GetAwaiter().GetResult());
+        var registerThread = new Thread(() => RunPipe("RegisterPipe").GetAwaiter().GetResult());
+        var encryptThread = new Thread(() => RunPipe("EncryptPipe").GetAwaiter().GetResult());
+        var decryptThread = new Thread(() => RunPipe("DecryptPipe").GetAwaiter().GetResult());
 
         loginThread.Start();
         registerThread.Start();
