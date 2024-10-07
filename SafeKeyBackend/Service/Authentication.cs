@@ -1,26 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Service
 {
-    public class Authentication : IAuthentication
+    public class Authentication
     {
-        public bool Login(string MasterPassword, string Secret)
+        public string GetSecret(string MasterPassword, string Secret)
         {
-            throw new NotImplementedException();
-        }
+            var argon2 = new Konscious.Security.Cryptography.Argon2id(System.Text.Encoding.UTF8.GetBytes(Secret));
+            argon2.Salt = System.Text.Encoding.UTF8.GetBytes(MasterPassword);
+            argon2.DegreeOfParallelism = 8; // number of threads to use
+            argon2.MemorySize = 1024 * 1024; // 1 GB
+            argon2.Iterations = 4; // number of iterations
 
-        public string Register(string MasterPassowrd)
-        {
-            return GetSecret(MasterPassowrd);
-        }
-
-        private string GetSecret(string MasterPassword)
-        {
-            return "Secret for " + MasterPassword;
+            var hashBytes = argon2.GetBytes(32); // length of the hash in bytes
+            return Convert.ToBase64String(hashBytes);
         }
     }
 }
