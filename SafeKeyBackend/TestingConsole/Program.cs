@@ -1,12 +1,30 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Repository;
-using Service;
+﻿using System.IO.Pipes;
+using System.Text;
 
-Console.WriteLine("Hello, World!");
-string workingPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
-Directory.CreateDirectory(workingPath + "/PasswordBucket");
-string content = Console.ReadLine() ?? "NOTHING";
-FileHandler.InitFileHandler(workingPath + "/PasswordBucket");
-Encryption encryption = new Encryption();
-string filename = encryption.Encrypt(content, "KEY");
-Console.WriteLine(workingPath + "/PasswordBucket/" + filename);
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var server = new NamedPipeServerStream("SafeKeyBackendPipe", PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+
+        Console.WriteLine("Waiting for connection...");
+        await server.WaitForConnectionAsync();
+        Console.WriteLine("Connected!");
+
+        await Task.Run(async () =>
+        {
+            byte[] buffer = new byte[1024];
+            while (true)
+            {
+                int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead == 0)
+                {
+                    break;
+                }
+
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                Console.WriteLine("Received from frontend: " + message);
+            }
+        });
+    }
+}

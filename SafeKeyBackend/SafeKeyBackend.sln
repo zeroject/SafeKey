@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{FB9D27B1-7145-4FE0-AAB0-B012A1EE44DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingConsole", "TestingConsole\TestingConsole.csproj", "{75CDC51F-5938-470D-A58F-B71E60C06371}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entry", "TestingConsole\Entry.csproj", "{75CDC51F-5938-470D-A58F-B71E60C06371}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{054FBEBE-F655-4D48-B0BF-98433CA7BFDE}"
 EndProject
