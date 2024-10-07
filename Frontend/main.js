@@ -3,6 +3,8 @@ import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Store from 'electron-store';
+import os from 'os';
+import net from 'net';
 
 // Add this to enable auto-reload during development
 const __filename = fileURLToPath(import.meta.url);
@@ -12,12 +14,13 @@ const store = new Store();
 
 let mainWindow;
 let registerWindow;
+let client;
 
 function createMainWindow () {
   mainWindow = new BrowserWindow({
-    width: 400,
+    width: 800,
     height: 600,
-    resizable: false,
+    resizable: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true, // Recommended for security
@@ -32,8 +35,7 @@ function createMainWindow () {
   });
 
   Menu.setApplicationMenu(null); // Hide default menu
-  // Uncomment to open DevTools for debugging
-  // win.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 }
 
 function createRegisterWindow() {
@@ -46,6 +48,8 @@ function createRegisterWindow() {
     parent: mainWindow,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true, // Recommended for security
+      nodeIntegration: false, // Disable Node.js integration in renderer
     },
   });
 
@@ -63,6 +67,29 @@ function createRegisterWindow() {
 app.whenReady().then(() => {
   // Check if the app has been registered
   const isRegistered = store.get('isRegistered', false);
+  const pipeName = os.platform() === 'win32' ? '\\\\.\\pipe\\LoginPipe' : '/tmp/LoginPipe.sock';
+
+  client = net.createConnection(pipeName, () => {
+    console.log('Connected to backend with named pipes');
+  });
+
+  client.on('data', (data) => {
+    console.log('Received from backend:', data.toString());
+    // Forward data to renderer process
+    mainWindow.webContents.send('backend-message', data.toString());
+  });
+
+  client.on('end', () => {
+    console.log('Disconnected from backend');
+  });
+
+  client.on('error', (err) => {
+    console.error('Pipe connection error:', err);
+  });
+
+  client.on('ready', () => {
+    console.log('client is ready');
+  });
 
   if (isRegistered) {
     createMainWindow();
@@ -81,6 +108,16 @@ app.whenReady().then(() => {
       }
     }
   });
+});
+
+ipcMain.on('renderer-message', (event, message) => {
+  if (client && !client.destroyed) {
+    console.log('Sending msg');
+    client.write(message);
+    console.log('Msg is send');
+  } else {
+    console.log('Cannot send message, pipe is not connected');
+  }
 });
 
 ipcMain.on('registration-complete', (event, data) => {
@@ -102,4 +139,16 @@ ipcMain.on('registration-complete', (event, data) => {
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
+});
+
+// Handle graceful shutdown
+app.on('before-quit', () => {
+  if (client) {
+    client.end(); // Gracefully close the connection
+  }
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
