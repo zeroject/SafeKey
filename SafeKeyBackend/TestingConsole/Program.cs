@@ -36,25 +36,26 @@ class Program
                 {
                     try
                     {
-                        int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
-                        if (bytesRead == 0)
+                        switch (pipeName)
                         {
-                            break; // Connection closed
+                            case "RegisterPipe":
+                                Register(buffer, server);
+                                break;
+                            case "LoginPipe":
+                                Login(buffer, server);
+                                break;
+                            case "EncryptPipe":
+                                Encrypt(buffer, server);
+                                break;
+                            case "DecryptPipe":
+                                Decrypt(buffer, server);
+                                break;
                         }
-
-                        string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                        Console.WriteLine($"{pipeName} received from frontend: {message}");
-
-                        // Optionally, you can send a response back to the frontend
-                        string response = $"{pipeName} received your message: {message}";
-                        byte[] responseBytes = Encoding.UTF8.GetBytes(response);
-                        await server.WriteAsync(responseBytes, 0, responseBytes.Length);
-                        await server.FlushAsync();
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"{pipeName} error: {ex.Message}");
-                        break; // Exit the inner loop on error
+                        break;
                     }
                 }
 
@@ -62,5 +63,33 @@ class Program
                 Console.WriteLine($"{pipeName} connection closed. Waiting for new connection...");
             }
         }
+    }
+
+    private static async void Register(byte[] buffer, NamedPipeServerStream server)
+    {
+        int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
+        string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+        Console.WriteLine($"Register received from frontend: {message}");
+    }
+
+    private static async void Login(byte[] buffer, NamedPipeServerStream server)
+    {
+        int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
+        string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+        Console.WriteLine($"Login received from frontend: {message}");
+    }
+
+    private static async void Encrypt(byte[] buffer, NamedPipeServerStream server)
+    {
+        int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
+        string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+        Console.WriteLine($"Encrypt received from frontend: {message}");
+    }
+
+    private static async void Decrypt(byte[] buffer, NamedPipeServerStream server)
+    {
+        int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
+        string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+        Console.WriteLine($"Decrypt received from frontend: {message}");
     }
 }

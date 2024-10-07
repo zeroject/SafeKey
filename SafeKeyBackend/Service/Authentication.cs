@@ -15,7 +15,12 @@ namespace Service
 
         public string Register(string MasterPassowrd)
         {
-            throw new NotImplementedException();
+            return GetSecret(MasterPassowrd);
+        }
+
+        private string GetSecret(string MasterPassword)
+        {
+            return "Secret for " + MasterPassword;
         }
     }
 }
