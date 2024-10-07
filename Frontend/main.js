@@ -1,20 +1,10 @@
 // main.js
-import { app, BrowserWindow, ipcMain, Menu } from 'electron';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import Store from 'electron-store';
-import os from 'os';
-import net from 'net';
-
-// Add this to enable auto-reload during development
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const store = new Store();
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const path = require('path');
+const ClientManager  = require('./ClientManager');
 
 let mainWindow;
-let registerWindow;
-let client;
+let clientManager = new ClientManager();
 
 function createMainWindow () {
   mainWindow = new BrowserWindow({
@@ -36,105 +26,33 @@ function createMainWindow () {
 
   Menu.setApplicationMenu(null); // Hide default menu
   mainWindow.webContents.openDevTools();
-}
 
-function createRegisterWindow() {
-  registerWindow = new BrowserWindow({
-    width: 400,
-    height: 600,
-    resizable: false,
-    modal: true,
-    show: false,
-    parent: mainWindow,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true, // Recommended for security
-      nodeIntegration: false, // Disable Node.js integration in renderer
-    },
-  });
-
-  registerWindow.loadFile('register.html');
-
-  registerWindow.once('ready-to-show', () => {
-    registerWindow.show();
-  });
-
-  registerWindow.on('closed', () => {
-    registerWindow = null;
-  });
+  clientManager.onClientReady = () => {
+    // Send an IPC message when the client is ready
+    mainWindow.webContents.send('client-ready'); // Notify renderer
+};
 }
 
 app.whenReady().then(() => {
-  // Check if the app has been registered
-  const isRegistered = store.get('isRegistered', false);
-  const pipeName = os.platform() === 'win32' ? '\\\\.\\pipe\\LoginPipe' : '/tmp/LoginPipe.sock';
-
-  client = net.createConnection(pipeName, () => {
-    console.log('Connected to backend with named pipes');
-  });
-
-  client.on('data', (data) => {
-    console.log('Received from backend:', data.toString());
-    // Forward data to renderer process
-    mainWindow.webContents.send('backend-message', data.toString());
-  });
-
-  client.on('end', () => {
-    console.log('Disconnected from backend');
-  });
-
-  client.on('error', (err) => {
-    console.error('Pipe connection error:', err);
-  });
-
-  client.on('ready', () => {
-    console.log('client is ready');
-  });
-
-  if (isRegistered) {
-    createMainWindow();
-  } else {
-    createMainWindow();
-    createRegisterWindow();
-  }
+  createMainWindow();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      if (store.get('isRegistered', false)) {
-        createMainWindow();
-      } else {
-        createMainWindow();
-        createRegisterWindow();
-      }
+      createMainWindow();
     }
   });
 });
 
-ipcMain.on('renderer-message', (event, message) => {
-  if (client && !client.destroyed) {
-    console.log('Sending msg');
-    client.write(message);
-    console.log('Msg is send');
-  } else {
-    console.log('Cannot send message, pipe is not connected');
-  }
+ipcMain.handle('initClient', async () => {
+  await clientManager.initClient();
 });
 
-ipcMain.on('registration-complete', (event, data) => {
-  // You can process registration data here if needed
+ipcMain.handle('sendToBackend', (event, args) => {
+  clientManager.onClientSendMsg(args);
+});
 
-  // Set the flag to indicate registration is complete
-  store.set('isRegistered', true);
-
-  // Close the registration window
-  if (registerWindow) {
-    registerWindow.close();
-  }
-
-  // Optionally, show the main window if it was hidden
-  if (mainWindow) {
-    mainWindow.show();
-  }
+ipcMain.handle('clientReady', (event, args) => {
+  clientManager.onClientReady();
 });
 
 app.on('window-all-closed', function () {
@@ -143,9 +61,6 @@ app.on('window-all-closed', function () {
 
 // Handle graceful shutdown
 app.on('before-quit', () => {
-  if (client) {
-    client.end(); // Gracefully close the connection
-  }
 });
 
 // Handle unhandled promise rejections

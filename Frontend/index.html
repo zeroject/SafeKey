@@ -24,14 +24,16 @@
 </head>
 
 <body>
-  <div class="container">
+  <div id="loading">
+    <wa-spinner style="font-size: 6rem;"></wa-spinner>
+  </div>
+  <div id="content" class="container">
     <img src="safekey.png" alt="SafeKey Logo" class="logo">
     <wa-card class="login-card">
-      <h2 style="color: #1e1e1e;">Login</h2>
       <form id="login-form">
         <wa-input label="Password" type="password" id="password" required></wa-input>
         <wa-input label="Secret" type="password" id="secret" required></wa-input>
-        <wa-button id="login-button" type="submit" size="large" color="primary">Login</wa-button>
+        <wa-button id="login-button" type="submit" size="large" color="primary">Unlock</wa-button>
       </form>
     </wa-card>
   </div>
