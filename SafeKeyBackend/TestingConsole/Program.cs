@@ -10,10 +10,10 @@ class Program
         var encryptPipe = new NamedPipeServerStream("EncryptPipe", PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
         var decryptPipe = new NamedPipeServerStream("DecryptPipe", PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
-        var loginThread = new Thread(() => RunLoginPipe(loginPipe).GetAwaiter().GetResult());
-        var registerThread = new Thread(() => RunRegisterPipe(registerPipe).GetAwaiter().GetResult());
-        var encryptThread = new Thread(() => RunEncryptPipe(encryptPipe).GetAwaiter().GetResult());
-        var decryptThread = new Thread(() => RunDecryptPipe(decryptPipe).GetAwaiter().GetResult());
+        var loginThread = new Thread(() => RunPipe(loginPipe, "Login Pipe").GetAwaiter().GetResult());
+        var registerThread = new Thread(() => RunPipe(registerPipe, "Register Pipe").GetAwaiter().GetResult());
+        var encryptThread = new Thread(() => RunPipe(encryptPipe, "Encrypt Pipe").GetAwaiter().GetResult());
+        var decryptThread = new Thread(() => RunPipe(decryptPipe, "Decrypt Pipe").GetAwaiter().GetResult());
 
         loginThread.Start();
         registerThread.Start();
@@ -26,99 +26,32 @@ class Program
         decryptThread.Join();
     }
 
-    static async Task RunLoginPipe(NamedPipeServerStream server)
+    static async Task RunPipe(NamedPipeServerStream server, string pipeName)
     {
-        Console.WriteLine("Waiting for connection...");
-        server.WaitForConnection();
+        Console.WriteLine($"{pipeName} waiting for connection...");
+        await server.WaitForConnectionAsync();
+        Console.WriteLine($"{pipeName} connected.");
+
+        byte[] buffer = new byte[1024];
         while (true)
         {
-            await Task.Run(async () =>
+            int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
+            if (bytesRead == 0)
             {
-                byte[] buffer = new byte[1024];
-                while (true)
-                {
-                    int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
-                    if (bytesRead == 0)
-                    {
-                        break;
-                    }
+                break; // Connection closed
+            }
 
-                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine("Received from frontend: " + message);
-                }
-            });
+            string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            Console.WriteLine($"{pipeName} received from frontend: {message}");
+
+            // Optionally, you can send a response back to the frontend
+            string response = $"{pipeName} received your message: {message}";
+            byte[] responseBytes = Encoding.UTF8.GetBytes(response);
+            await server.WriteAsync(responseBytes, 0, responseBytes.Length);
+            await server.FlushAsync();
         }
-    }
 
-    static async Task RunRegisterPipe(NamedPipeServerStream server)
-    {
-        Console.WriteLine("Waiting for connection...");
-        server.WaitForConnection();
-        while (true)
-        {
-            await Task.Run(async () =>
-            {
-                byte[] buffer = new byte[1024];
-                while (true)
-                {
-                    int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
-                    if (bytesRead == 0)
-                    {
-                        break;
-                    }
+        server.Close();
 
-                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine("Received from frontend: " + message);
-                }
-            });
-        }
-    }
-
-    static async Task RunEncryptPipe(NamedPipeServerStream server)
-    {
-        Console.WriteLine("Waiting for connection...");
-        server.WaitForConnection();
-        while (true)
-        {
-            await Task.Run(async () =>
-            {
-                byte[] buffer = new byte[1024];
-                while (true)
-                {
-                    int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
-                    if (bytesRead == 0)
-                    {
-                        break;
-                    }
-
-                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine("Received from frontend: " + message);
-                }
-            });
-        }
-    }
-
-    static async Task RunDecryptPipe(NamedPipeServerStream server)
-    {
-        Console.WriteLine("Waiting for connection...");
-        server.WaitForConnection();
-        while (true)
-        {
-            await Task.Run(async () =>
-            {
-                byte[] buffer = new byte[1024];
-                while (true)
-                {
-                    int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
-                    if (bytesRead == 0)
-                    {
-                        break;
-                    }
-
-                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine("Received from frontend: " + message);
-                }
-            });
-        }
     }
 }
