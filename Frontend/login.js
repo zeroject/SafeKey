@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
       console.log('Frontend Send');
       if (window.api && window.api.sendToBackend) {
-        clientManager.onClientSendMsg(password);
+        window.api.sendToBackend(password);
         console.log('Frontend Sent');
       } else {
         console.error('window.api.sendToBackend is not defined');

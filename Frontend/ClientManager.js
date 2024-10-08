@@ -4,7 +4,8 @@ const net = require('net');
 class ClientManager {
 
   constructor() {
-    this.client = null; // Initialize your client later
+    this.client = null; // Properly declare client as a class property
+    this.readyPromise = null; // Initialize readyPromise
   }
 
   // Initialize the client and set up the 'ready' event listener
