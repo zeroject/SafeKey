@@ -1,5 +1,6 @@
 const os = require('os');
 const net = require('net');
+const { ipcMain } = require('electron');
 
 class ClientManager {
 
@@ -25,6 +26,9 @@ class ClientManager {
 
         this.client.on('data', (data) => {
             console.log('Received from backend:', data.toString());
+            if (data.toString() === 'Login Success'){
+              ipcMain.emit('login-success');
+            }
             // Forward data to renderer process
         });
 

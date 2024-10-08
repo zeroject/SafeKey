@@ -30,13 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
   
       console.log('Frontend Send');
       if (window.api && window.api.sendToBackend) {
-        window.api.sendToBackend(password);
+        window.api.sendToBackend(password + ';' + secret);
         console.log('Frontend Sent');
       } else {
         console.error('window.api.sendToBackend is not defined');
       }
-  
-      loginButton.removeAttribute('loading');
     });
   });
   

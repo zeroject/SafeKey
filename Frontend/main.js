@@ -55,6 +55,10 @@ ipcMain.handle('clientReady', (event, args) => {
   clientManager.onClientReady();
 });
 
+ipcMain.on('login-success', () => {
+  mainWindow.loadFile('mainWindow.html');
+});
+
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
