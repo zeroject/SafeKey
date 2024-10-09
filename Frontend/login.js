@@ -1,5 +1,24 @@
+
+async function initialize() {
+  try {
+      await window.api.initClient(); // Wait for the client to initialize
+      // Now you can safely update the UI
+      window.api.onClientReady(() => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('content').style.display = 'block';
+      });
+  } catch (err) {
+      console.error('Error initializing client:', err);
+  }
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('content').style.display = 'none';
+
+    initialize();
   
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -11,19 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
   
       console.log('Frontend Send');
       if (window.api && window.api.sendToBackend) {
-        window.api.sendToBackend(password);
+        window.api.sendToBackend(password + ';' + secret);
         console.log('Frontend Sent');
       } else {
         console.error('window.api.sendToBackend is not defined');
       }
-
-      window.api.onBackendMessage((data) => {
-        // Handle the response from the backend
-        console.log('Received message from backend:', data);
-        // You can add logic to update the UI or handle errors based on the response
-      });
-  
-      loginButton.removeAttribute('loading');
     });
   });
   

@@ -1,9 +1,7 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Content Security Policy -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' https://early.webawesome.com;
@@ -11,7 +9,7 @@
     font-src 'self' https://early.webawesome.com;
   ">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SafeKey - Login</title>
+  <title>SafeKey - Main</title>
   
   <!-- Web Awesome CSS -->
   <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/themes/default.css" />
@@ -24,21 +22,12 @@
 </head>
 
 <body>
-  <div id="loading">
-    <wa-spinner style="font-size: 6rem;"></wa-spinner>
-  </div>
-  <div id="content" class="container">
-    <img src="safekey.png" alt="SafeKey Logo" class="logo">
-    <wa-card class="login-card">
-      <form id="login-form">
-        <wa-input label="Password" type="password" id="password" required></wa-input>
-        <wa-input label="Secret" type="password" id="secret" required></wa-input>
-        <wa-button id="login-button" type="submit" size="large" color="primary">Unlock</wa-button>
-      </form>
-    </wa-card>
+  <div class="container">
+    <h1>Welcome to SafeKey</h1>
+    <!-- Your main application content goes here -->
   </div>
 
   <!-- Renderer JS -->
-  <script src="login.js"></script>
+  <script src="mainApp.js"></script>
 </body>
 </html>
