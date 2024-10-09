@@ -59,3 +59,10 @@ a:hover {
   margin-bottom: -10px;
   margin-top: -40px;
 }
+
+#entry-list {
+}
+
+wa-card {
+  margin: 8px; /* Space between cards */
+}

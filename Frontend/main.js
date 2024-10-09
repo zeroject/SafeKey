@@ -8,7 +8,7 @@ let clientManager = new ClientManager();
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
+    width: 600,
     height: 600,
     resizable: true,
     webPreferences: {
@@ -25,7 +25,7 @@ function createMainWindow() {
   });
 
   Menu.setApplicationMenu(null); // Hide default menu
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -50,8 +50,14 @@ ipcMain.handle("sendToBackend", (event, args) => {
   clientManager.onClientSendMsg(args[0], args[1]);
 });
 
+ipcMain.handle("send-new-entry", async (event, args) => {
+  await clientManager.onClientSendMsg("encrypt", args[0]);
+  let data = await clientManager.initDecryptClient();
+  mainWindow.webContents.send("data-from-backend", data);
+});
+
 ipcMain.on("login-success", async () => {
-  mainWindow.loadFile("mainWindow.html");
+  await mainWindow.loadFile("mainWindow.html");
   let data = await clientManager.initDecryptClient();
   console.log("Data from backend:", data);
   mainWindow.webContents.send("data-from-backend", data);

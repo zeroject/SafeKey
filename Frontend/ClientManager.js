@@ -116,31 +116,35 @@ class ClientManager {
   initDecryptClient() {
     const encryptPipeURL = this._getPipeURL('DecryptPipe');
     return this.connectWithRetry(() => new Promise((resolve, reject) => {
-      this.decryptClient = net.createConnection(encryptPipeURL, () => {
-        console.log('Connected to backend with Decrypt Pipe');
-      });
+        this.decryptClient = net.createConnection(encryptPipeURL, () => {
+            console.log('Connected to backend with Decrypt Pipe');
+        });
 
-      this.decryptClient.on('connect', () => {
-        console.log('Decrypt client is connected');
-        resolve();
-      });
+        this.decryptClient.on('connect', () => {
+            console.log('Decrypt client is connected');
+        });
 
-      this.decryptClient.on('data', (data) => {
-        const textDecoder = new TextDecoder('utf-8');
-        let message = textDecoder.decode(data);
-        console.log('Received from Decrypt backend:', message);
-        return message;
-      });
+        this.decryptClient.on('data', (data) => {
+            const textDecoder = new TextDecoder('utf-8');
+            let message = textDecoder.decode(data);
+            console.log('Received from Decrypt backend:', message);
+            
+            // Resolve the promise with the received message
+            resolve(message);
+        });
 
-      this.decryptClient.on('end', () => {
-        console.log('Disconnected from Decrypt Pipe');
-      });
+        this.decryptClient.on('end', () => {
+            console.log('Disconnected from Decrypt Pipe');
+        });
 
-      this.decryptClient.on('error', (err) => {
-        console.error('Decrypt Pipe connection error:', err);
-      });
+        this.decryptClient.on('error', (err) => {
+            console.error('Decrypt Pipe connection error:', err);
+            // Reject the promise if there's an error
+            reject(err);
+        });
     }));
-  }
+}
+
 
   /**
    * Connects with retry logic.
