@@ -136,6 +136,7 @@ class Program
                     Console.WriteLine($"{pipeName} error: {ex.Message}");
                 }
 
+                server.Disconnect();
             }
         }
     }
