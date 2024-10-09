@@ -53,7 +53,7 @@ class Program
                         int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
                         string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
-                        if (string.IsNullOrWhiteSpace(message))
+                        if (!string.IsNullOrWhiteSpace(message))
                         {
                             _CurrentSecret = _AuthenticationService.GetSecret(message.Split(";")[0], message.Split(";")[1]);
                         }
@@ -96,7 +96,7 @@ class Program
                         int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
                         string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
-                        if (string.IsNullOrWhiteSpace(message))
+                        if (!string.IsNullOrWhiteSpace(message))
                         {
                             _EncryptionService.Encrypt(message, _CurrentSecret!);
                         }
@@ -126,7 +126,7 @@ class Program
                 {
                     try
                     {
-                        if (string.IsNullOrWhiteSpace(_CurrentSecret))
+                        if (!string.IsNullOrWhiteSpace(_CurrentSecret))
                         {
                             await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentSecret!).ToString()!));
                         }
