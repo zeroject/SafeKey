@@ -123,7 +123,10 @@ class Program
             {
                 if (!string.IsNullOrWhiteSpace(_CurrentKey))
                 {
-                    await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentKey!).ToString()!));
+                    string[] decryptedStringArray = _EncryptionService.Decrypt(_CurrentKey);
+                    string decryptedStrings = string.Join(":", decryptedStringArray);
+
+                    await server.WriteAsync(Encoding.UTF8.GetBytes(decryptedStrings));
                 }
             }
             catch (Exception ex)

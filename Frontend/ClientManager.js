@@ -127,7 +127,7 @@ class ClientManager {
 
       this.decryptClient.on('data', (data) => {
         const textDecoder = new TextDecoder('utf-8');
-        message = textDecoder.decode(data);
+        let message = textDecoder.decode(data);
         console.log('Received from Decrypt backend:', message);
         return message;
       });
