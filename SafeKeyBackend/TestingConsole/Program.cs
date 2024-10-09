@@ -132,7 +132,7 @@ class Program
             }
         }
 
-        Console.WriteLine($"{pipeName} connection closed. Waiting for new connection...");
+        Console.WriteLine($"{pipeName} ran and closed connection. Waiting for new connection...");
     }
 }
 }
