@@ -8,65 +8,77 @@ namespace Service
     {
         public Encryption() { }
         public Encryption(string key) { }
+        private static readonly byte[] IV = new byte[16] { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF };
 
-        public string[] Decrypt(string Key)
+
+        public string[] Decrypt(string key)
         {
-            string[] encryptedContent = FileHandler.ReadFromFile();
-            List<string> decryptedContent = new List<string>();
+            string[] encryptedStrings = FileHandler.ReadFromFile();
+            string[] decryptedStrings = new string[encryptedStrings.Length];
 
-            using (Aes aesAlg = Aes.Create())
+            using (Aes aes = Aes.Create())
             {
-                var keyBytes = Encoding.UTF8.GetBytes(Key);
-                Array.Resize(ref keyBytes, aesAlg.Key.Length);
-                aesAlg.Key = keyBytes;
+                aes.Key = Convert.FromBase64String(key);
+                aes.IV = IV;
 
-                foreach (var encryptedText in encryptedContent)
+                if (aes.Key.Length != 16 && aes.Key.Length != 24 && aes.Key.Length != 32)
                 {
-                    var fullCipher = Convert.FromBase64String(encryptedText);
-                    var iv = new byte[aesAlg.BlockSize / 8];
-                    var cipherText = new byte[fullCipher.Length - iv.Length];
+                    throw new ArgumentException("Key must be 16, 24, or 32 bytes long.");
+                }
 
-                    Array.Copy(fullCipher, iv, iv.Length);
-                    Array.Copy(fullCipher, iv.Length, cipherText, 0, cipherText.Length);
+                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-                    aesAlg.IV = iv;
+                for (int i = 0; i < encryptedStrings.Length; i++)
+                {
+                    byte[] encrypted = Convert.FromBase64String(encryptedStrings[i]);
 
-                    using (var decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV))
-                    using (var msDecrypt = new MemoryStream(cipherText))
-                    using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    using (var srDecrypt = new StreamReader(csDecrypt))
+                    try
                     {
-                        decryptedContent.Add(srDecrypt.ReadToEnd());
+                        using (MemoryStream ms = new MemoryStream(encrypted))
+                        {
+                            using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                            {
+                                using (StreamReader sr = new StreamReader(cs))
+                                {
+                                    decryptedStrings[i] = sr.ReadToEnd();
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Decryption failed. Probably due to wrong key.");
                     }
                 }
             }
 
-            return decryptedContent.ToArray();
+            return decryptedStrings;
         }
 
-        public void Encrypt(string content, string Key)
+        public void Encrypt(string content, string key)
         {
-            using (Aes aesAlg = Aes.Create())
+            using (Aes aes = Aes.Create())
             {
-                var keyBytes = Encoding.UTF8.GetBytes(Key);
-                Array.Resize(ref keyBytes, aesAlg.Key.Length);
-                aesAlg.Key = keyBytes;
+                aes.Key = Convert.FromBase64String(key);
+                aes.IV = IV;
 
-                aesAlg.GenerateIV();
-                var iv = aesAlg.IV;
-
-                using (var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV))
-                using (var msEncrypt = new MemoryStream())
+                if (aes.Key.Length != 16 && aes.Key.Length != 24 && aes.Key.Length != 32)
                 {
-                    msEncrypt.Write(iv, 0, iv.Length);
-                    using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    using (var swEncrypt = new StreamWriter(csEncrypt))
-                    {
-                        swEncrypt.Write(content);
-                    }
+                    throw new ArgumentException("Key must be 16, 24, or 32 bytes long.");
+                }
 
-                    var encryptedContent = msEncrypt.ToArray();
-                    FileHandler.SaveToFile(Convert.ToBase64String(encryptedContent));
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter sw = new StreamWriter(cs))
+                        {
+                            sw.Write(content);
+                        }
+                    }
+                    FileHandler.SaveToFile(Convert.ToBase64String(ms.ToArray()));
                 }
             }
         }

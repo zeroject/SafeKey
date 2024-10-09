@@ -4,7 +4,7 @@ using Service;
 
 class Program
 {
-    private static string? _CurrentSecret;
+    private static string? _CurrentKey;
     private readonly Authentication _AuthenticationService;
     private readonly Encryption _EncryptionService;
 
@@ -38,7 +38,7 @@ class Program
             {
                 Console.WriteLine($"{pipeName} waiting for connection...");
                 await server.WaitForConnectionAsync();
-                _CurrentSecret = null;
+                _CurrentKey = null;
                 Console.WriteLine($"{pipeName} connected.");
 
                 byte[] buffer = new byte[1024];
@@ -51,7 +51,7 @@ class Program
 
                         if (!string.IsNullOrWhiteSpace(message))
                         {
-                            _CurrentSecret = _AuthenticationService.GetSecret(message.Split(";")[0], message.Split(";")[1]);
+                            _CurrentKey = _AuthenticationService.GetKey(message.Split(";")[0], message.Split(";")[1]);
                         }
                     }
                     catch (Exception ex)
@@ -94,7 +94,7 @@ class Program
 
                         if (!string.IsNullOrWhiteSpace(message))
                         {
-                            _EncryptionService.Encrypt(message, _CurrentSecret!);
+                            _EncryptionService.Encrypt(message, _CurrentKey!);
                         }
                     }
                     catch (Exception ex)
@@ -121,9 +121,10 @@ class Program
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(_CurrentSecret))
+                if (!string.IsNullOrWhiteSpace(_CurrentKey))
                 {
-                    await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentSecret!).ToString()!));
+                    _EncryptionService.Encrypt("DecryptSuccess", _CurrentKey!);
+                    await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentKey!).ToString()!));
                 }
             }
             catch (Exception ex)
