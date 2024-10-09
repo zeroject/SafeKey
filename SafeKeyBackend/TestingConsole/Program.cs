@@ -122,21 +122,20 @@ class Program
                 Console.WriteLine($"{pipeName} connected.");
 
                 byte[] buffer = new byte[1024];
-                while (true)
+
+
+                try
                 {
-                    try
+                    if (!string.IsNullOrWhiteSpace(_CurrentSecret))
                     {
-                        if (!string.IsNullOrWhiteSpace(_CurrentSecret))
-                        {
-                            await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentSecret!).ToString()!));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"{pipeName} error: {ex.Message}");
-                        break;
+                        await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentSecret!).ToString()!));
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{pipeName} error: {ex.Message}");
+                }
+
             }
         }
     }
