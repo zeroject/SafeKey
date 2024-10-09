@@ -24,7 +24,19 @@
 <body>
   <div class="container">
     <h1>Welcome to SafeKey</h1>
-    <!-- Your main application content goes here -->
+
+    <!-- Skeleton loader for waiting -->
+    <div id="loading" class="wa-skeleton wa-skeleton--block"></div>
+
+    <!-- List of entries from backend -->
+    <div id="entry-list" style="display: none;">
+      <wa-card>
+        <wa-card-header>Entries</wa-card-header>
+        <wa-card-content>
+          <ul id="entry-container"></ul>
+        </wa-card-content>
+      </wa-card>
+    </div>
   </div>
 
   <!-- Renderer JS -->

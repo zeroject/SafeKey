@@ -19,14 +19,12 @@ class ClientManager {
    */
   initClient() {
     const loginPipeURL = this._getPipeURL('LoginPipe');
-    const encryptPipeURL = this._getPipeURL('EncryptPipe');
     const decryptPipeURL = this._getPipeURL('DecryptPipe');
 
     this.loginReady = this.initLoginClient(loginPipeURL);
-    this.encryptReady = this.initEncryptClient(encryptPipeURL);
     this.decryptReady = this.initDecryptClient(decryptPipeURL);
 
-    return Promise.all([this.loginReady, this.encryptReady, this.decryptReady])
+    return Promise.all([this.loginReady, this.decryptReady])
       .then(() => {
         console.log('All clients are connected and ready.');
       })
@@ -52,14 +50,13 @@ class ClientManager {
    * @returns {Promise} - Resolves when connected, rejects on error.
    */
   initLoginClient(pipeURL) {
-    return new Promise((resolve, reject) => {
+    return this.connectWithRetry(() => new Promise((resolve, reject) => {
       this.loginClient = net.createConnection(pipeURL, () => {
         console.log('Connected to backend with Login Pipe');
       });
 
       this.loginClient.on('connect', () => {
         console.log('Login client is connected');
-        this.onClientReady('login');
         resolve();
       });
 
@@ -79,28 +76,23 @@ class ClientManager {
         console.error('Login Pipe connection error:', err);
         reject(err);
       });
-    });
+    }));
   }
 
   /**
    * Initializes the Encrypt client.
-   * @param {string} pipeURL - The pipe URL to connect to.
    * @returns {Promise} - Resolves when connected, rejects on error.
    */
-  initEncryptClient(pipeURL) {
+  initEncryptClient() {
+    const encryptPipeURL = this._getPipeURL('EncryptPipe');
     return new Promise((resolve, reject) => {
-      this.encryptClient = net.createConnection(pipeURL, () => {
-        console.log('Connected to backend with Encrypt Pipe');
+      this.encryptClient = net.createConnection(encryptPipeURL, () => {
+        console.log('Connected to backend with Encrypt Pipe' + encryptPipeURL);
       });
 
       this.encryptClient.on('connect', () => {
         console.log('Encrypt client is connected');
         resolve();
-      });
-
-      this.encryptClient.on('data', (data) => {
-        const message = data.toString();
-        console.log('Received from Encrypt backend:', message);
       });
 
       this.encryptClient.on('end', () => {
@@ -111,6 +103,10 @@ class ClientManager {
         console.error('Encrypt Pipe connection error:', err);
         reject(err);
       });
+
+      this.encryptClient.on('close', (hadError) => {
+        console.log(`Encrypt Pipe connection closed${hadError ? ' due to error' : ''}`);
+      });
     });
   }
 
@@ -120,7 +116,7 @@ class ClientManager {
    * @returns {Promise} - Resolves when connected, rejects on error.
    */
   initDecryptClient(pipeURL) {
-    return new Promise((resolve, reject) => {
+    return this.connectWithRetry(() => new Promise((resolve, reject) => {
       this.decryptClient = net.createConnection(pipeURL, () => {
         console.log('Connected to backend with Decrypt Pipe');
       });
@@ -143,15 +139,38 @@ class ClientManager {
         console.error('Decrypt Pipe connection error:', err);
         reject(err);
       });
-    });
+    }));
   }
 
   /**
-   * Handler called when a client is ready.
-   * @param {string} clientType - The type of client ('login', 'encrypt', 'decrypt').
+   * Connects with retry logic.
+   * @param {function} connectFn - A function that returns a promise to connect.
+   * @param {number} retries - Number of times to retry.
+   * @param {number} delay - Delay between retries in milliseconds.
+   * @returns {Promise} - Resolves when connected, rejects on error.
    */
-  onClientReady(clientType) {
-    console.log(`${clientType.charAt(0).toUpperCase() + clientType.slice(1)} client is ready - perform actions here.`);
+  async connectWithRetry(connectFn, retries = 10, delay = 2000) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await connectFn();
+      } catch (error) {
+        console.error(`Connection attempt ${i + 1} failed:`, error);
+        if (i < retries - 1) {
+          console.log(`Retrying in ${delay / 1000} seconds...`);
+          await this.delay(delay);
+        }
+      }
+    }
+    throw new Error('All connection attempts failed.');
+  }
+
+  /**
+   * Delays execution for a given amount of time.
+   * @param {number} ms - The delay time in milliseconds.
+   * @returns {Promise} - Resolves after the delay.
+   */
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**

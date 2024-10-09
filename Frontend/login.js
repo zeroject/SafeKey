@@ -1,9 +1,9 @@
 
 async function initialize() {
   try {
-      await window.api.initClient(); // Wait for the client to initialize
       // Now you can safely update the UI
-      window.api.onClientReady(() => {
+      window.api.ConnectedToBackend((event) => {
+        console.log('Has been summoned');
           document.getElementById('loading').style.display = 'none';
           document.getElementById('content').style.display = 'block';
       });
@@ -14,6 +14,7 @@ async function initialize() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    window.api.initClient();
     const loginForm = document.getElementById('login-form');
     document.getElementById('loading').style.display = 'block';
     document.getElementById('content').style.display = 'none';
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
       console.log('Frontend Send');
       if (window.api && window.api.sendToBackend) {
-        window.api.sendToBackend(password + ';' + secret);
+        window.api.sendToBackend('login', password + ';' + secret);
         console.log('Frontend Sent');
       } else {
         console.error('window.api.sendToBackend is not defined');
