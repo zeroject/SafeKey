@@ -22,6 +22,27 @@
 </head>
 
 <body>
+  <div>
+    <wa-button id="create-password-button" size="large" color="primary">Create Password</wa-button>
+
+    <wa-dialog id="create-password-dialog" header="Create New Entry" modal>
+      <form>
+        <!-- Entry Name -->
+        <wa-input id="entry-name" placeholder="Enter name"></wa-input>
+
+        <!-- Username -->
+        <wa-input id="entry-username" placeholder="Enter username"></wa-input>
+
+        <!-- Password Field with Auto-Generate Option -->
+        <wa-input id="entry-password" type="password" placeholder="Enter password"></wa-input>
+        <wa-button id="auto-generate-password" size="medium" color="secondary">Auto-Generate Password</wa-button>
+
+        <!-- Submit and Cancel Buttons -->
+        <wa-button id="submit-entry" size="large" color="primary">Submit</wa-button>
+        <wa-button id="cancel-dialog" size="large" color="danger">Cancel</wa-button>
+      </form>
+    </wa-dialog>
+  </div>
   <div class="container">
     <h1>Welcome to SafeKey</h1>
 

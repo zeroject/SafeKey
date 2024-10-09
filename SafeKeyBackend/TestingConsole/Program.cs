@@ -123,7 +123,6 @@ class Program
             {
                 if (!string.IsNullOrWhiteSpace(_CurrentKey))
                 {
-                    _EncryptionService.Encrypt("DecryptSuccess", _CurrentKey!);
                     await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentKey!).ToString()!));
                 }
             }

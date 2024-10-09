@@ -80,7 +80,7 @@ class ClientManager {
    * Initializes the Encrypt client.
    * @returns {Promise} - Resolves when connected, rejects on error.
    */
-  initEncryptClient() {
+  initEncryptClient(message) {
     const encryptPipeURL = this._getPipeURL('EncryptPipe');
     return new Promise((resolve, reject) => {
       this.encryptClient = net.createConnection(encryptPipeURL, () => {
@@ -89,6 +89,7 @@ class ClientManager {
 
       this.encryptClient.on('connect', () => {
         console.log('Encrypt client is connected');
+        this.encryptClient.write(message);
         resolve();
       });
 
@@ -125,7 +126,10 @@ class ClientManager {
       });
 
       this.decryptClient.on('data', (data) => {
-        const message = data.toString();
+        const message = data[0];
+        data.forEach((element) => {
+          console.log(element);
+        });
         console.log('Received from Decrypt backend:', message);
         return message;
       });
@@ -181,9 +185,16 @@ class ClientManager {
     switch (clientType) {
       case 'login':
         client = this.loginClient;
+        if (client && !client.destroyed) {
+          console.log(`Sending message to ${clientType} client:`, message);
+          client.write(message);
+          console.log('Message sent.');
+        } else {
+          console.error(`Cannot send message. ${clientType} client is not connected.`);
+        }
         break;
       case 'encrypt':
-        client = this.encryptClient;
+        this.initEncryptClient(message);
         break;
       case 'decrypt':
         client = this.decryptClient;
@@ -191,14 +202,6 @@ class ClientManager {
       default:
         console.error('Unknown client type:', clientType);
         return;
-    }
-
-    if (client && !client.destroyed) {
-      console.log(`Sending message to ${clientType} client:`, message);
-      client.write(message);
-      console.log('Message sent.');
-    } else {
-      console.error(`Cannot send message. ${clientType} client is not connected.`);
     }
   }
 
