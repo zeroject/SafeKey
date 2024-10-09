@@ -66,7 +66,6 @@ class Program
                     }
                     catch (Exception)
                     {
-                        await server.WriteAsync(Encoding.UTF8.GetBytes("Login Failed"));
                         break;
                     }
 
