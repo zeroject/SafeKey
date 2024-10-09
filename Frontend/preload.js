@@ -11,5 +11,5 @@ contextBridge.exposeInMainWorld('api', {
   onClientReady: () => {
     ipcRenderer.addListener('client-ready'); // Listen for client-ready event
   },
-  AskForData: () => {},
+  AskForData: (callback) => ipcRenderer.on('data-from-backend', () => callback()),
 });

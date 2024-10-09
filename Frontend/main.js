@@ -50,8 +50,11 @@ ipcMain.handle("sendToBackend", (event, args) => {
   clientManager.onClientSendMsg(args[0], args[1]);
 });
 
-ipcMain.on("login-success", () => {
+ipcMain.on("login-success", async () => {
   mainWindow.loadFile("mainWindow.html");
+  let data = await clientManager.initDecryptClient();
+  console.log("Data from backend:", data);
+  mainWindow.webContents.send("data-from-backend", data);
 });
 
 app.on("window-all-closed", function () {

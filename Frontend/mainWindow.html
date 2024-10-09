@@ -30,11 +30,9 @@
 
     <!-- List of entries from backend -->
     <div id="entry-list" style="display: none;">
-      <wa-card>
-        <wa-card-header>Entries</wa-card-header>
-        <wa-card-content>
-          <ul id="entry-container"></ul>
-        </wa-card-content>
+      <wa-card with-header>
+        <div slot="header">Entries</div>
+        <ul id="entry-container"></ul>
       </wa-card>
     </div>
   </div>

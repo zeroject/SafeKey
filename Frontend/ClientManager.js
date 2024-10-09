@@ -19,12 +19,9 @@ class ClientManager {
    */
   initClient() {
     const loginPipeURL = this._getPipeURL('LoginPipe');
-    const decryptPipeURL = this._getPipeURL('DecryptPipe');
-
     this.loginReady = this.initLoginClient(loginPipeURL);
-    this.decryptReady = this.initDecryptClient(decryptPipeURL);
 
-    return Promise.all([this.loginReady, this.decryptReady])
+    return Promise.all([this.loginReady])
       .then(() => {
         console.log('All clients are connected and ready.');
       })
@@ -115,9 +112,10 @@ class ClientManager {
    * @param {string} pipeURL - The pipe URL to connect to.
    * @returns {Promise} - Resolves when connected, rejects on error.
    */
-  initDecryptClient(pipeURL) {
+  initDecryptClient() {
+    const encryptPipeURL = this._getPipeURL('DecryptPipe');
     return this.connectWithRetry(() => new Promise((resolve, reject) => {
-      this.decryptClient = net.createConnection(pipeURL, () => {
+      this.decryptClient = net.createConnection(encryptPipeURL, () => {
         console.log('Connected to backend with Decrypt Pipe');
       });
 
@@ -129,6 +127,7 @@ class ClientManager {
       this.decryptClient.on('data', (data) => {
         const message = data.toString();
         console.log('Received from Decrypt backend:', message);
+        return message;
       });
 
       this.decryptClient.on('end', () => {
@@ -137,7 +136,6 @@ class ClientManager {
 
       this.decryptClient.on('error', (err) => {
         console.error('Decrypt Pipe connection error:', err);
-        reject(err);
       });
     }));
   }
