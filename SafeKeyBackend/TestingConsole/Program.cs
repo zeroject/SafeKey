@@ -16,14 +16,10 @@ class Program
 
     static void Main(string[] args)
     {
-        var loginPipe = new NamedPipeServerStream("LoginPipe", PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-        var encryptPipe = new NamedPipeServerStream("EncryptPipe", PipeDirection.In, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-        var decryptPipe = new NamedPipeServerStream("DecryptPipe", PipeDirection.Out, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-
         var programInstance = new Program();
-        var loginThread = new Thread(() => programInstance.RunLoginPipe(loginPipe, "LoginPipe").GetAwaiter().GetResult());
-        var encryptThread = new Thread(() => programInstance.RunEncryptPipe(encryptPipe, "EncryptPipe").GetAwaiter().GetResult());
-        var decryptThread = new Thread(() => programInstance.RunDecryptPipe(decryptPipe, "DecryptPipe").GetAwaiter().GetResult());
+        var loginThread = new Thread(() => programInstance.RunLoginPipe("LoginPipe").GetAwaiter().GetResult());
+        var encryptThread = new Thread(() => programInstance.RunEncryptPipe("EncryptPipe").GetAwaiter().GetResult());
+        var decryptThread = new Thread(() => programInstance.RunDecryptPipe("DecryptPipe").GetAwaiter().GetResult());
 
         loginThread.Start();
         encryptThread.Start();
@@ -34,11 +30,11 @@ class Program
         decryptThread.Join();
     }
 
-    public async Task RunLoginPipe(NamedPipeServerStream server, string pipeName)
+    public async Task RunLoginPipe(string pipeName)
     {
         while (true)
         {
-            using (server)
+            using (var server = new NamedPipeServerStream("LoginPipe", PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous))
             {
                 Console.WriteLine($"{pipeName} waiting for connection...");
                 await server.WaitForConnectionAsync();
@@ -78,11 +74,11 @@ class Program
         }
     }
 
-    public async Task RunEncryptPipe(NamedPipeServerStream server, string pipeName)
+    public async Task RunEncryptPipe(string pipeName)
     {
         while (true)
         {
-            using (server)
+            using (var server = new NamedPipeServerStream("EncryptPipe", PipeDirection.In, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous))
             {
                 Console.WriteLine($"{pipeName} waiting for connection...");
                 await server.WaitForConnectionAsync();
@@ -111,33 +107,32 @@ class Program
         }
     }
 
-    public async Task RunDecryptPipe(NamedPipeServerStream server, string pipeName)
+    public async Task RunDecryptPipe(string pipeName)
+{
+    while (true)
     {
-        while (true)
+        using (var server = new NamedPipeServerStream("DecryptPipe", PipeDirection.Out, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous))
         {
-            using (server)
+            Console.WriteLine($"{pipeName} waiting for connection...");
+            await server.WaitForConnectionAsync();
+            Console.WriteLine($"{pipeName} connected.");
+
+            byte[] buffer = new byte[1024];
+
+            try
             {
-                Console.WriteLine($"{pipeName} waiting for connection...");
-                await server.WaitForConnectionAsync();
-                Console.WriteLine($"{pipeName} connected.");
-
-                byte[] buffer = new byte[1024];
-
-
-                try
+                if (!string.IsNullOrWhiteSpace(_CurrentSecret))
                 {
-                    if (!string.IsNullOrWhiteSpace(_CurrentSecret))
-                    {
-                        await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentSecret!).ToString()!));
-                    }
+                    await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentSecret!).ToString()!));
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"{pipeName} error: {ex.Message}");
-                }
-
-                server.Disconnect();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{pipeName} error: {ex.Message}");
             }
         }
+
+        Console.WriteLine($"{pipeName} connection closed. Waiting for new connection...");
     }
+}
 }
