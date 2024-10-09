@@ -126,7 +126,10 @@ class Program
                 {
                     try
                     {
-                        await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentSecret!).ToString()!));
+                        if (string.IsNullOrWhiteSpace(_CurrentSecret))
+                        {
+                            await server.WriteAsync(Encoding.UTF8.GetBytes(_EncryptionService.Decrypt(_CurrentSecret!).ToString()!));
+                        }
                     }
                     catch (Exception ex)
                     {
