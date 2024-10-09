@@ -44,7 +44,7 @@ namespace Service
             return decryptedContent.ToArray();
         }
 
-        public string Encrypt(string content, string Key)
+        public void Encrypt(string content, string Key)
         {
             using (Aes aesAlg = Aes.Create())
             {
@@ -66,7 +66,7 @@ namespace Service
                     }
 
                     var encryptedContent = msEncrypt.ToArray();
-                    return FileHandler.SaveToFile(Convert.ToBase64String(encryptedContent));
+                    FileHandler.SaveToFile(Convert.ToBase64String(encryptedContent));
                 }
             }
         }
