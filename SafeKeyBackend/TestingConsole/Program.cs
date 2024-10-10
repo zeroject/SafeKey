@@ -103,39 +103,40 @@ class Program
                         break;
                     }
                 }
+                Console.WriteLine($"{pipeName} ran and closed connection.");
             }
         }
     }
 
     public async Task RunDecryptPipe(string pipeName)
-{
-    while (true)
     {
-        using (var server = new NamedPipeServerStream("DecryptPipe", PipeDirection.Out, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous))
+        while (true)
         {
-            Console.WriteLine($"{pipeName} waiting for connection...");
-            await server.WaitForConnectionAsync();
-            Console.WriteLine($"{pipeName} connected.");
-
-            byte[] buffer = new byte[1024];
-
-            try
+            using (var server = new NamedPipeServerStream("DecryptPipe", PipeDirection.Out, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous))
             {
-                if (!string.IsNullOrWhiteSpace(_CurrentKey))
-                {
-                    string[] decryptedStringArray = _EncryptionService.Decrypt(_CurrentKey);
-                    string decryptedStrings = string.Join(":", decryptedStringArray);
+                Console.WriteLine($"{pipeName} waiting for connection...");
+                await server.WaitForConnectionAsync();
+                Console.WriteLine($"{pipeName} connected.");
 
-                    await server.WriteAsync(Encoding.UTF8.GetBytes(decryptedStrings));
+                byte[] buffer = new byte[1024];
+
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(_CurrentKey))
+                    {
+                        string[] decryptedStringArray = _EncryptionService.Decrypt(_CurrentKey);
+                        string decryptedStrings = string.Join(":", decryptedStringArray);
+
+                        await server.WriteAsync(Encoding.UTF8.GetBytes(decryptedStrings));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{pipeName} error: {ex.Message}");
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{pipeName} error: {ex.Message}");
-            }
-        }
 
-        Console.WriteLine($"{pipeName} ran and closed connection. Waiting for new connection...");
+            Console.WriteLine($"{pipeName} ran and closed connection. Waiting for new connection...");
+        }
     }
-}
 }

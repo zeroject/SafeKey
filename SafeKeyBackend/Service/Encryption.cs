@@ -13,7 +13,13 @@ namespace Service
 
         public string[] Decrypt(string key)
         {
-            string[] encryptedStrings = FileHandler.ReadFromFile();
+            string[] encryptedStrings = FileHandler.ReadAllFiles();
+            if (encryptedStrings.Length == 0)
+            {
+                Console.WriteLine("No encrypted strings found.");
+                return [];
+            }
+            
             string[] decryptedStrings = new string[encryptedStrings.Length];
 
             using (Aes aes = Aes.Create())
@@ -69,16 +75,25 @@ namespace Service
 
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
-                using (MemoryStream ms = new MemoryStream())
+                try
                 {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        using (StreamWriter sw = new StreamWriter(cs))
+                        using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                         {
-                            sw.Write(content);
+                            using (StreamWriter sw = new StreamWriter(cs))
+                            {
+                                sw.Write(content);
+                            }
                         }
+                        // Read the contents of the MemoryStream before it is disposed
+                        string encryptedContent = Convert.ToBase64String(ms.ToArray());
+                        FileHandler.SaveToFile(encryptedContent);
                     }
-                    FileHandler.SaveToFile(Convert.ToBase64String(ms.ToArray()));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Encryption failed with exception: " + ex.Message);
                 }
             }
         }
