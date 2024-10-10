@@ -85,24 +85,22 @@ class Program
                 Console.WriteLine($"{pipeName} connected.");
 
                 byte[] buffer = new byte[1024];
-                while (true)
+                try
                 {
-                    try
-                    {
-                        int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
-                        string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    int bytesRead = await server.ReadAsync(buffer, 0, buffer.Length);
+                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
-                        if (!string.IsNullOrWhiteSpace(message))
-                        {
-                            _EncryptionService.Encrypt(message, _CurrentKey!);
-                        }
-                    }
-                    catch (Exception ex)
+                    if (!string.IsNullOrWhiteSpace(message))
                     {
-                        Console.WriteLine($"{pipeName} error: {ex.Message}");
-                        break;
+                        _EncryptionService.Encrypt(message, _CurrentKey!);
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{pipeName} error: {ex.Message}");
+                    break;
+                }
+
                 Console.WriteLine($"{pipeName} ran and closed connection.");
             }
         }
