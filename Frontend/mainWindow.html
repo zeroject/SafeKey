@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/themes/default.css" />
 
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="mainStyles.css">
   
   <!-- Web Awesome JS -->
   <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/webawesome.loader.js"></script>
@@ -44,13 +44,13 @@
     </wa-dialog>
   </div>
   <div class="container">
-    <h1>Welcome to SafeKey</h1>
+    <img src="safekey.png" alt="SafeKey Logo" class="app-logo">
 
     <!-- Skeleton loader for waiting -->
     <div id="loading" class="wa-skeleton wa-skeleton--block"></div>
 
     <!-- List of entries from backend -->
-    <div id="entry-list" style="display: none; overflow-y: auto; height: 400px;">
+    <div id="entry-list" class="entry-list" style="overflow-y: auto; overflow-x: hidden; height: 300px;">
     </div>
   </div>
 

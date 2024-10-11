@@ -4,16 +4,25 @@
   "main": "main.js",
   "type": "commonjs",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "electron": "^32.1.2",
+    "electron-builder": "^25.1.7",
     "electron-reload": "^2.0.0-alpha.1"
   },
   "dependencies": {
     "electron-store": "^10.0.0"
+  },
+  "build": {
+    "appId": "com.yourapp.id",
+    "productName": "SafeKey",
+    "win": {
+      "target": "nsis"
+    }
   }
 }

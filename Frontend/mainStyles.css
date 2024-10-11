@@ -1,0 +1,76 @@
+/* Style for the logo image */
+.app-logo {
+  width: 200px; /* Adjust as needed */
+  height: auto;
+  display: block;
+  margin: 20px auto; /* Center the image */
+}
+
+/* Container for the entries */
+.entry-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  justify-content: center; /* Center the entries */
+}
+
+/* Individual entry card */
+.entry-card {
+  padding: 15px;
+  width: 300px; /* Fixed width for consistency */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Entry name */
+.entry-name {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Entry username */
+.entry-username {
+  font-size: 1em;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+/* Entry password (masked) */
+.entry-password {
+  font-size: 1em;
+  margin-bottom: 15px;
+  color: #777;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #121212;
+  font-family: Arial, sans-serif;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow-y: hidden;
+}
+
+wa-card {
+  margin: 2px; /* Space between cards */
+}
+
+.custom-styles {
+    --success-color: white;
+    --error-color: white;
+    color: white;
+  }
+
+.custom-styles::part(button) {
+    background-color: #00c3ff;
+    border: solid 2px #00a2ff;
+    border-radius: 6px;
+  }

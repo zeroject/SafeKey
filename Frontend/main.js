@@ -52,6 +52,7 @@ ipcMain.handle("sendToBackend", (event, args) => {
 
 ipcMain.handle("send-new-entry", async (event, args) => {
   await clientManager.onClientSendMsg("encrypt", args[0]);
+  await new Promise(resolve => setTimeout(resolve, 500));
   let data = await clientManager.initDecryptClient();
   mainWindow.webContents.send("data-from-backend", data);
 });

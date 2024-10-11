@@ -27,22 +27,35 @@ window.api.AskForData((event, data) => {
 
       // Create the wa-card element
       const card = document.createElement("wa-card");
+      card.classList.add("entry-card");
       card.setAttribute("with-header", ""); // Add the 'with-header' attribute
       // Create the header slot
       const header = document.createElement("div");
       header.setAttribute("slot", "header");
+      header.classList.add("entry-header");
       header.textContent = name; // Set the name as header text
       // Create the username and password elements
-      const usernameElement = document.createElement("h2");
+      const usernameElement = document.createElement("p");
+      usernameElement.classList.add("entry-username");
       usernameElement.textContent = "Username: "+ username; // Set the username text
 
-      const passwordElement = document.createElement("h2");
-      passwordElement.textContent = "Password: " + password; // Set the password text
+      const passwordElement = document.createElement("input");
+      passwordElement.setAttribute("type", "password");
+      passwordElement.setAttribute("id", "password-field");
+      passwordElement.setAttribute("readonly", "true");
+      passwordElement.classList.add("entry-password");
+      passwordElement.value = password; // Set the password text
+
+      const copyPasswordButton = document.createElement("wa-copy-button");
+      copyPasswordButton.classList.add("custom-styles");
+      copyPasswordButton.setAttribute("value", password);
+
 
       // Append the header and content to the card
       card.appendChild(header);
       card.appendChild(usernameElement);
       card.appendChild(passwordElement);
+      card.appendChild(copyPasswordButton);
 
       // Append the card to the entry container
       entryContainer.appendChild(card);
@@ -70,9 +83,26 @@ const autoGeneratePasswordButton = document.getElementById(
 const passwordInput = document.getElementById("entry-password");
 
 autoGeneratePasswordButton.addEventListener("click", () => {
-  const generatedPassword = Math.random().toString(36).slice(-10); // Generate a simple random password
+  const generatedPassword = generateStrongPassword(); // Generate a simple random password
   passwordInput.value = generatedPassword;
 });
+
+function generateStrongPassword(length = 18) {
+  const upperCaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lowerCaseLetters = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const symbols = '!@#$%^&*()_+[]{}|,./<>?`~-=\\'; // Excluding ";" and ":"
+
+  const allCharacters = upperCaseLetters + lowerCaseLetters + numbers + symbols;
+  
+  let password = '';
+  for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * allCharacters.length);
+      password += allCharacters[randomIndex];
+  }
+
+  return password;
+}
 
 // Submit button logic (you can handle the form submission here)
 const submitEntryButton = document.getElementById("submit-entry");
