@@ -19,13 +19,34 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loading').style.display = 'block';
     document.getElementById('content').style.display = 'none';
 
+    const registerBtn = document.getElementById('register');
+    const registerDialog = document.getElementById('register-dialog');
+    const confirm = document.getElementById('confirm');
+    const sc = document.getElementById('secret-input');
+
+    registerBtn.addEventListener('click', () => {
+      registerDialog.open = true;
+      sc.style.display = 'none';
+      window.api.register();
+      window.api.registerDone((event, secret) => {
+        document.getElementById('register-loading').style.display = 'none';
+        sc.style.display = 'block';
+        sc.value = secret;
+        document.getElementById('secret').value = secret;
+      });
+    });
+
+    confirm.addEventListener('click', () => {
+      registerDialog.open = false;
+    });
+
     initialize();
   
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
   
       const password = document.getElementById('password').value;
-      const secret = document.getElementById('secret').value; // Not used in sendToBackend, consider if needed
+      const secret = document.getElementById('secret').value;
       const loginButton = document.getElementById('login-button');
       loginButton.setAttribute('loading', 'true');
   

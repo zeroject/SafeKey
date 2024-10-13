@@ -7,11 +7,15 @@ class ClientManager {
     this.loginClient = null;
     this.encryptClient = null;
     this.decryptClient = null;
+    this.registarClient = null;
+    this.logoutClient = null;
 
     // Promises to track readiness of each client
     this.loginReady = null;
     this.encryptReady = null;
     this.decryptReady = null;
+    this.registarReady = null;
+    this.logoutReady = null;
   }
 
   /**
@@ -104,6 +108,62 @@ class ClientManager {
 
       this.encryptClient.on('close', (hadError) => {
         console.log(`Encrypt Pipe connection closed${hadError ? ' due to error' : ''}`);
+      });
+    });
+  }
+
+  initRegistarPipe() {
+    const registarPipeURL = this._getPipeURL('RegistarPipe');
+    return new Promise((resolve, reject) => {
+      this.registarClient = net.createConnection(registarPipeURL, () => {
+        console.log('Connected to backend with Registar Pipe');
+      });
+
+      this.registarClient.on('connect', () => {
+        console.log('Registar client is connected');
+      });
+
+      this.registarClient.on('data', (data) => {
+        const textDecoder = new TextDecoder('ascii');
+        const message = textDecoder.decode(data);
+        console.log('Received from Registar backend:', message);
+        resolve(message);
+      });
+
+      this.registarClient.on('end', () => {
+        console.log('Disconnected from Registar Pipe');
+      });
+
+      this.registarClient.on('error', (err) => {
+        console.error('Registar Pipe connection error:', err);
+        reject(err);
+      });
+    });
+  }
+
+  initLogoutPipe() {
+    const logoutPipeURL = this._getPipeURL('LogoutPipe');
+    return new Promise((resolve, reject) => {
+      this.logoutClient = net.createConnection(logoutPipeURL, () => {
+        console.log('Connected to backend with Logout Pipe');
+      });
+
+      this.logoutClient.on('connect', () => {
+        resolve();
+        console.log('Logout client is connected');
+      });
+
+      this.logoutClient.on('data', (data) => {
+        console.log('Received from Logout backend:');
+      });
+
+      this.logoutClient.on('end', () => {
+        console.log('Disconnected from Logout Pipe');
+      });
+
+      this.logoutClient.on('error', (err) => {
+        console.error('Logout Pipe connection error:', err);
+        reject(err);
       });
     });
   }
@@ -201,6 +261,9 @@ class ClientManager {
       case 'decrypt':
         client = this.decryptClient;
         break;
+      case 'logout':
+        this.closeAllClients();
+        break;
       default:
         console.error('Unknown client type:', clientType);
         return;
@@ -210,8 +273,9 @@ class ClientManager {
   /**
    * Close all client connections gracefully.
    */
-  closeAllClients() {
-    [this.loginClient, this.encryptClient, this.decryptClient].forEach((client, index) => {
+  async closeAllClients() {
+    await this.initLogoutPipe();
+    [this.loginClient, this.encryptClient, this.decryptClient, this.loginClient, this.registarClient].forEach((client, index) => {
       if (client) {
         client.end(() => {
           console.log(`Client ${index} disconnected gracefully.`);

@@ -7,11 +7,17 @@ namespace Service
     public class Encryption
     {
         public Encryption() { }
-        public Encryption(string key) { }
-        private static readonly byte[] IV = new byte[16] { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF };
 
+        public byte[] CreateIV()
+        {
+            using (Aes aes = Aes.Create())
+            {
+                aes.GenerateIV();
+                return aes.IV;
+            }
+        }
 
-        public string[] Decrypt(string key)
+        public string[] Decrypt(string key, byte[] IV)
         {
             string[] encryptedStrings = FileHandler.ReadAllFiles();
             if (encryptedStrings.Length == 0)
@@ -61,7 +67,7 @@ namespace Service
             return decryptedStrings;
         }
 
-        public void Encrypt(string content, string key)
+        public void Encrypt(string content, string key, byte[] IV)
         {
             using (Aes aes = Aes.Create())
             {

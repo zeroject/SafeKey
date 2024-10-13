@@ -70,6 +70,12 @@ createPasswordButton.addEventListener("click", () => {
   createPasswordDialog.open = true;
 });
 
+const logoutButton = document.getElementById("logout-button");
+logoutButton.addEventListener("click", () => {
+  window.api.sendToBackend("logout", "");
+  window.close();
+});
+
 // Close the dialog when cancel is clicked
 const cancelDialogButton = document.getElementById("cancel-dialog");
 cancelDialogButton.addEventListener("click", () => {

@@ -1,44 +1,78 @@
 <!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <!-- Content Security Policy -->
-  <meta http-equiv="Content-Security-Policy" content="
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Content Security Policy -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
     default-src 'self';
     script-src 'self' https://early.webawesome.com;
     style-src 'self' 'unsafe-inline' https://early.webawesome.com;
     font-src 'self' https://early.webawesome.com;
-  ">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SafeKey - Login</title>
-  
-  <!-- Web Awesome CSS -->
-  <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/themes/default.css" />
+  "
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SafeKey - Login</title>
 
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css">
-  
-  <!-- Web Awesome JS -->
-  <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/webawesome.loader.js"></script>
-</head>
+    <!-- Web Awesome CSS -->
+    <link
+      rel="stylesheet"
+      href="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/themes/default.css"
+    />
 
-<body>
-  <div id="loading">
-    <wa-spinner style="font-size: 6rem;"></wa-spinner>
-  </div>
-  <div id="content" class="container">
-    <img src="safekey.png" alt="SafeKey Logo" class="logo">
-    <wa-card class="login-card">
-      <form id="login-form">
-        <wa-input label="Password" type="password" id="password" required></wa-input>
-        <wa-input label="Secret" type="password" id="secret" required></wa-input>
-        <wa-button id="login-button" type="submit" size="large" color="primary">Unlock</wa-button>
-      </form>
-    </wa-card>
-  </div>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css" />
 
-  <!-- Renderer JS -->
-  <script src="login.js"></script>
-</body>
+    <!-- Web Awesome JS -->
+    <script
+      type="module"
+      src="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/webawesome.loader.js"
+    ></script>
+  </head>
+
+  <body>
+    <div id="loading">
+      <wa-spinner style="font-size: 6rem"></wa-spinner>
+    </div>
+    <div id="content" class="container">
+      <img src="safekey.png" alt="SafeKey Logo" class="logo" />
+      <wa-card class="login-card">
+        <form id="login-form">
+          <wa-input
+            label="Password"
+            type="password"
+            id="password"
+            required
+          ></wa-input>
+          <wa-input
+            label="Secret"
+            type="password"
+            id="secret"
+            required
+          ></wa-input>
+          <wa-button
+            id="login-button"
+            type="submit"
+            size="large"
+            color="primary"
+            >Unlock</wa-button
+          >
+        </form>
+      </wa-card>
+      <wa-button id="register" size="large" color="primary">Register</wa-button>
+      <wa-dialog id="register-dialog" header="Register New User" modal>
+        <h1>Keep this secret a secure location!!</h1>
+        <div id="register-loading">
+          <wa-spinner style="font-size: 6rem"></wa-spinner>
+        </div>
+        <wa-input id="secret-input" placeholder="secret" aria-readonly="true"></wa-input>
+        <wa-button id="confirm" size="medium" color="secondary">I have saved my secret</wa-button>
+      </wa-dialog>
+    </div>
+
+    <!-- Renderer JS -->
+    <script src="login.js"></script>
+  </body>
 </html>

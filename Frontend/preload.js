@@ -21,4 +21,10 @@ contextBridge.exposeInMainWorld("api", {
       callback(event, data);
     });
   },
+  registerDone: (callback) => {
+    ipcRenderer.on("secret", (event, secret) => {
+      callback(event, secret);
+    });
+  },
+  register: () => ipcRenderer.invoke("register"),
 });

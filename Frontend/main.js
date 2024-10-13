@@ -44,6 +44,11 @@ ipcMain.handle("initClient", async () => {
   mainWindow.webContents.send("connected-to-backend");
 });
 
+ipcMain.handle("register", async () => {
+  let secret = await clientManager.initRegistarPipe();
+  mainWindow.webContents.send("secret", secret);
+});
+
 ipcMain.handle("client-read", (event, args) => {});
 
 ipcMain.handle("sendToBackend", (event, args) => {
