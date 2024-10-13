@@ -28,8 +28,8 @@ While SafeKey sounds great there is some short sights one is if the users pc is 
 
 ## Project Visuals
  <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-  <img src="https://github.com/user-attachments/assets/1d8fb6be-0a4e-423a-9f49-0e27a252acbd" alt="billede" style="width: 48%; margin: 1%;">
-  <img src="https://github.com/user-attachments/assets/562dcb4a-1c3f-42de-9ef5-845ac4319735" alt="billede" style="width: 48%; margin: 1%;">
-  <img src="https://github.com/user-attachments/assets/0665c33a-8362-462f-8661-2da78f818442" alt="billede" style="width: 48%; margin: 1%;">
-  <img src="https://github.com/user-attachments/assets/c49dc2b3-76c2-43da-9b10-df358c7fc57f" alt="billede" style="width: 48%; margin: 1%;">
+  <img src="https://github.com/user-attachments/assets/784647dc-f748-4915-b54e-957653ea6fe1" alt="billede" style="width: 48%; margin: 1%;">
+  <img src="https://github.com/user-attachments/assets/8ac309a4-2ce2-43d8-89fb-883a75067216" alt="billede" style="width: 48%; margin: 1%;">
+  <img src="https://github.com/user-attachments/assets/fcc5c672-4412-476f-a4ed-7544a0fd8979" alt="billede" style="width: 48%; margin: 1%;">
+  <img src="https://github.com/user-attachments/assets/84282574-4c26-409e-8fda-eaa22eb9db12" alt="billede" style="width: 48%; margin: 1%;">
 </div>
